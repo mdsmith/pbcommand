@@ -1,12 +1,16 @@
 import pprint
 import unittest
 import logging
+import sys
+import os
+from cStringIO import StringIO
 
 from base_utils import get_data_file
 
 from pbcommand.cli.resolver import resolve_tool_contract
 from pbcommand.pb_io.tool_contract_io import (load_resolved_tool_contract_from,
-                                              load_tool_contract_from)
+                                              load_tool_contract_from,
+                                              write_tool_contract)
 
 log = logging.getLogger(__name__)
 
@@ -73,9 +77,20 @@ class TestRunDevApp(unittest.TestCase):
     file_name = "dev_example_tool_contact.json"
     path = get_data_file(file_name)
 
-    @unittest.skipIf(_HAS_PBCORE, "pbcore is not installed. Not running dev_app from resolved contract.")
+    @unittest.skipUnless(_HAS_PBCORE, "pbcore is not installed. Not running dev_app from resolved contract.")
     def test_01(self):
         exe = "python -m pbcommand.cli.examples.dev_app --resolved-tool-contract {p}".format(p=self.path)
         log.info("running resolved contract {r}".format(r=self.path))
         log.info(exe)
         self.assertTrue(True)
+
+    @unittest.skipUnless(_HAS_PBCORE, "pbcore is not installed")
+    def test_emit_and_reload(self):
+        import pbcommand.cli.examples.dev_app
+        p = pbcommand.cli.examples.dev_app.get_contract_parser()
+        write_tool_contract(p, "test_tool_contract.json")
+        try:
+            #IO.tool_contract_to_meta_task_from_file
+            tool_contract = load_tool_contract_from("test_tool_contract.json")
+        finally:
+            os.remove("test_tool_contract.json")

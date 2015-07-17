@@ -222,15 +222,17 @@ class ToolContractParser(PbParserBase):
     def to_tool_contract(self):
         _t = dict(input_types=self.input_types,
                   output_types=self.output_types,
-                  task_type=self.task_type,
+                  tool_contract_id=self.tool_id,
+                  name=self.tool_id,
+                  description=self.description,
+                  version=self.version,
+                  tool_type=self.task_type,
                   schema_options=self.options,
                   nproc=self.nproc_symbol,
                   resource_types=self.resource_types,
                   _comment="Created by v{v}".format(v=__version__))
 
-        _d = dict(version=self.version,
-                  tool_contract_id=self.tool_id,
-                  driver=self.driver.to_dict(),
+        _d = dict(driver=self.driver.to_dict(),
                   tool_contract=_t)
         return _d
 
